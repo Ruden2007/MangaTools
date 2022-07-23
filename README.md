@@ -1,97 +1,45 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
-<div class="content">
-  <h2>О программе MangaTools:</h2>
-  <p>Привет, я Ruden(<a href="https://github.com/Ruden2007">Ruden2007</a> на GitHub) —<br>
-разработчик этой программы, также занимаюсь<br>
-переводом манги:
-      <div class="team-links">
-      <ul>
-      <li><a href="https://mangalib.me/team/ruden">MangaLib</a></li>
-      <li><a href="https://hentailib.me/team/ruden">HentaiLib</a></li>
-      <li><a href="https://boosty.to/ruden_manga">Boosty</a></li>
-</ul>
-</div>
-</p>
+usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
+           [--super-prefix=<path>] [--config-env=<name>=<envvar>]
+           <command> [<args>]
 
-  <p>Программа написана на языке python<br>
-      (да, медленный язык, но C++ я ещё только учу<br>
-      и не могу найти как на плюсах работать с sqlite),<br>
-      возможно, в будущем перепишу на C++ или,<br>
-      может быть, кто-то поможет переписать.</p>
+These are common Git commands used in various situations:
 
-  <p>Звуки для базы данных взяты у Imagawa_NC<br>
-      с его <a href="https://docs.google.com/spreadsheets/d/1-MvKAxWtmLNLb750gApJRtNwbtItF1PbEU395LuzifY/edit#gid=0">
-          Google Таблицы</a> по его согласию и<br>
-      будут дополняться в будущем.</p>
+start a working area (see also: git help tutorial)
+   clone     Clone a repository into a new directory
+   init      Create an empty Git repository or reinitialize an existing one
 
-  <p>Изначально программа должна была<br>
-      называться MangaSounds, и разрабатывалась только<br>
-      для удобного перевода звуков, но позднее я запланировал<br>
-      добавить в неё новый функционал(Перевод, клин, тайп).<br>
-      В связи с чем была переписана на фремворке Qt<br>
-      (начинал писать на Kivy и KivyMD)</p>
+work on the current change (see also: git help everyday)
+   add       Add file contents to the index
+   mv        Move or rename a file, a directory, or a symlink
+   restore   Restore working tree files
+   rm        Remove files from the working tree and from the index
 
-  <p>Перевод: будут 2 столбца — оригинальный текст<br>
-      и перевод. Думаю сделать удобную форму для быстрого<br>
-      ввода оригинального текста и кнопочку быстрого перевода<br>
-      с помощью API Reverso Context(типа быстро перевёл пере-<br>
-      водчиком, а потом уже редактируешь вручную. Обалденный<br>
-      переводчик — может искать синонимы, и недавно появился<br>
-      "перефразировщик"). Как будет реализован поиск синонимов — <br>
-      пока хз, наверное, будет открываться отдельное окно, и<br>
-      можно будет искать другие варианты перевода. А также<br>
-      добавлю какую-нибудь комбинацию клавиш для<br>
-      быстрого поиска синонима(выделяешь слово,<br>
-      нажимаешь клавиши и открывается окно<br>
-      с вариантами перевода, если выбрано<br>
-      английское слово), но пока хз какое<br>
-      API для синонимов использовать.</p>
+examine the history and state (see also: git help revisions)
+   bisect    Use binary search to find the commit that introduced a bug
+   diff      Show changes between commits, commit and working tree, etc
+   grep      Print lines matching a pattern
+   log       Show commit logs
+   show      Show various types of objects
+   status    Show the working tree status
 
-  <p>Также, возможно, сделаю ввод<br>
-      оригинального текста через распознавание фото.</p>
+grow, mark and tweak your common history
+   branch    List, create, or delete branches
+   commit    Record changes to the repository
+   merge     Join two or more development histories together
+   rebase    Reapply commits on top of another base tip
+   reset     Reset current HEAD to the specified state
+   switch    Switch branches
+   tag       Create, list, delete or verify a tag object signed with GPG
 
-  <p>Клин. Ну, тут всё просто: чтобы в ручную не убирать<br>
-      текст в облачках, программа будет распознавать текст и<br>
-      заливать его на выбор: белым, пользовательским, либо<br>
-      окружающим цветами. Можно будет выбрать, какие<br>
-      области не нужно закрашивать.</p>
+collaborate (see also: git help workflows)
+   fetch     Download objects and refs from another repository
+   pull      Fetch from and integrate with another repository or a local branch
+   push      Update remote refs along with associated objects
 
-  <p>Эффект восстанавливающей кисти не<br>
-      ожидайте — это всего лишь предобработка. Дальше<br>
-      будет кнопка, по нажатию которой, эта картинка(уже<br>
-      обработанная) откроется в фотошопе, там можно<br>
-      будет продолжить обработку.</p>
-
-  <p>Тайп. Тут опять же ничего<br>
-     серьёзного — просто помощник при тайпе, поиск<br>
-     вариантов переноса, синонимов и т.д.</p>
-
-  <p>Всё это будет храниться в одном файле(не сами<br>
-      изображения манги, а данные проекта). То есть, если<br>
-      нужна работа с изображениями, то вы должны перекинуть<br>
-      и нужные изображения, и сам файлик проекта, а если работа с<br>
-      изображениями не предусматривается то будет достаточно<br>
-      файла проекта. В будущем, возможно, сделаю<br>
-      синхронизацию через облако, но пока это<br>просто приложение для поиска<br>
-      вариантов перевода звуков.
-  </p>
-
-  <h4>Более подробную информацию<br>
-      как пользоваться приложением вы можете<br>
-      узнать по этим ссылкам:</h4>
-
-  <nav class="FAQ-links">
-      <ul>
-        <li><a href="">MangaSounds</a></li>
-        <li><a href="">Главная</a></li>
-        <li><a href="">Настройки</a></li>
-        </ul>
-  </nav>
-</div>
-</body>
-</html>
+'git help -a' and 'git help -g' list available subcommands and some
+concept guides. See 'git help <command>' or 'git help <concept>'
+to read about a specific subcommand or concept.
+See 'git help git' for an overview of the system.
