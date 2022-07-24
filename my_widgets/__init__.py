@@ -1,2 +1,2 @@
-from labels import DoubleClickToCopyLabel, ClickToCopyLabel
-from result_widget import ResultWidget
+from my_widgets.labels import DoubleClickToCopyLabel, ClickToCopyLabel
+from my_widgets.result_widget import ResultWidget

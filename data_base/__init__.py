@@ -1,1 +1,1 @@
-from db_search import SoundSearch
+from data_base.db_search import SoundSearch
