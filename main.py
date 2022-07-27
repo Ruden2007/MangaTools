@@ -1,7 +1,7 @@
 import sys
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt, Signal, QPoint
+from PySide6.QtGui import QFont, QColor
 
 import utils
 from data_base import SoundSearch
@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QLabel, QApplication, QW
 
 from main_window import Ui_MainWindow
 from main_keyboard import Ui_main_keyboard
+from add_sound import Ui_AddSound
 from my_widgets import ResultWidget
 
 
@@ -22,12 +23,64 @@ class MainKeyboard(QWidget):
         self.katakana = False
 
     def change_kana(self):
+        """Изменяет раскладку экранной клавиатуры
+        (заменяет текст внутри кнопок)"""
+
         if self.katakana:
-            utils.set_keyboard_kana(self, kana="hiragana")
+            utils.set_keyboard_kana(self=self.ki, kana="hiragana")
             self.katakana = False
         else:
-            utils.set_keyboard_kana(self, kana="katakana")
+            utils.set_keyboard_kana(self=self.ki, kana="katakana")
             self.katakana = True
+
+
+class AddSound(QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super(AddSound, self).__init__(*args, **kwargs)
+        self._pressed = False
+        self.Direction = None
+
+        # Фон прозрачный
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+
+        # Нет границы
+        self.setWindowFlag(Qt.FramelessWindowHint)
+
+        # Отслеживание мыши
+        self.setMouseTracking(True)
+
+        self.ui = Ui_AddSound()
+        self.ui.setupUi(self)
+
+        self.ui.close_btn.clicked.connect(self.ui.TitleBar.windowClosed.emit)
+        self.ui.btn_kana.clicked.connect(self.change_kana)
+        utils.add_sound_keyboard_button_connect(self)
+
+        # слот сигнала
+        self.ui.TitleBar.windowClosed.connect(self.close)
+        self.ui.TitleBar.windowMoved.connect(self.move)
+
+        self.katakana = False
+
+    def change_kana(self):
+        """Изменяет раскладку экранной клавиатуры (заменяет текст
+        внутри кнопок) и переназначает QLineEdit куда вводятся буквы"""
+
+        if self.katakana:
+            utils.set_keyboard_kana(self=self.ui, kana="hiragana")
+            self.katakana = False
+        else:
+            utils.set_keyboard_kana(self=self.ui, kana="katakana")
+            self.katakana = True
+
+    def keyboard_print(self, text: str):
+        """Активируется по нажатию кнопок на клавиатуре
+           и вводит текст с этих кнопок в конец строки хираганы"""
+
+        if self.katakana:
+            self.ui.kat.setText(self.ui.kat.text() + text)
+        else:
+            self.ui.hir.setText(self.ui.hir.text() + text)
 
 
 class MangaTools(QMainWindow):
@@ -36,6 +89,7 @@ class MangaTools(QMainWindow):
     def __init__(self):
         super(MangaTools, self).__init__()
 
+        self.add_sound_window = AddSound()
         self.sound_search = SoundSearch()
 
         self.ui = Ui_MainWindow()
@@ -46,9 +100,11 @@ class MangaTools(QMainWindow):
         self.ui.scrollArea.setWidget(self.widget)
         self.ui.scrollArea.setWidgetResizable(True)
 
+        # Подключаем кнопки
         self.ui.searchButton.clicked.connect(self.start_search)
         self.ui.search_input.returnPressed.connect(self.start_search)
         self.ui.btn_keyboard.clicked.connect(self.show_or_hide_main_keyboard)
+        self.ui.btn_add_sound.clicked.connect(self.show_add_sound)
 
         self.main_keyboard = MainKeyboard(self)
         self.ui.body_sounds.addWidget(self.main_keyboard)
@@ -64,12 +120,15 @@ class MangaTools(QMainWindow):
     # изменение размеров
     # noinspection PyUnresolvedReferences
     def resizeEvent(self, event):
+        """Отслеживает изменение размеров окна"""
+
         self.resized.emit()
         return super(MangaTools, self).resizeEvent(event)
 
     def resize_widgets(self):
         """Устанавливаем всему виджету максимальную ширину, умножаем высоту кнопок на их
            количество и прибавляем значение 6ти отступов по 2 единицы между ними"""
+
         h = self.main_keyboard.ki.btn_a.height()
         self.main_keyboard.setMaximumWidth((h * 5) + (2 * 6))
 
@@ -93,6 +152,9 @@ class MangaTools(QMainWindow):
             self.layout.itemAt(i).widget().setParent(None)
 
     def show_results(self, results: list):
+        """Выводит результаты поиска если таковые есть
+        иначе выводит надпись, что ничего не найдено"""
+
         if results:
             for result in results:
                 w = ResultWidget(result=result)
@@ -109,6 +171,9 @@ class MangaTools(QMainWindow):
 
     # клавиатура
     def show_or_hide_main_keyboard(self):
+        """Скрывает либо, показывает экранную
+        клавиатуру на вкладке со звуками"""
+
         if self.main_keyboard_hide:
             self.main_keyboard.show()
             self.main_keyboard_hide = False
@@ -119,9 +184,16 @@ class MangaTools(QMainWindow):
             self.resize_widgets()
 
     def keyboard_print(self, text: str):
+        """Активируется по нажатию кнопок на клавиатуре
+        и вводит текст с этих кнопок в конец строки поискового ввода"""
+
         self.ui.search_input.setText(self.ui.search_input.text() + text)
 
     def add_sound_mark(self):
+        """Добавляет к японским буквам спец символы
+        (заменяет текущую букву на букву со спецсимволом
+        из словаря dictionary_file.dict)"""
+
         text = self.ui.search_input.text()
         try:
             letter = text[-1]
@@ -131,6 +203,10 @@ class MangaTools(QMainWindow):
         self.ui.search_input.setText(text[:-1] + mark_letter)
 
     def change_letter_size(self):
+        """Заменяет последнюю японскую букву в строке
+        поискового ввода на букву нижнего регистра
+        (если такая есть в файле dictionary_file.dict)"""
+
         text = self.ui.search_input.text()
         try:
             letter = text[-1]
@@ -140,6 +216,8 @@ class MangaTools(QMainWindow):
         self.ui.search_input.setText(text[:-1] + letter)
 
     def backspace(self):
+        """Удаляет последнюю букву в строке поискового ввода"""
+
         text = self.ui.search_input.text()
         try:
             text[-1]
@@ -148,7 +226,13 @@ class MangaTools(QMainWindow):
         self.ui.search_input.setText(text[:-1])
 
     def clear_search_input(self):
+        """Очищает строку поискового ввода"""
+
         self.ui.search_input.setText("")
+
+    # Окна
+    def show_add_sound(self):
+        self.add_sound_window.show()
 
 
 if __name__ == "__main__":
