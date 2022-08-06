@@ -137,3 +137,8 @@
 ホ = ボ
 ボ = ポ
 ポ = ホ
+
+[keyboard_layout_hex]
+rus = 0x419
+eng = 0x409
+jap = 0x411

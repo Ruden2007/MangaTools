@@ -1,16 +1,17 @@
 import sys
 
-from PySide6.QtCore import Qt, Signal, QPoint
-from PySide6.QtGui import QFont, QColor
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QFont
 
-import utils
+import keyboard_tools
+from Transcription import Transcript, ErrorTranscript
 from data_base import SoundSearch
 
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QLabel, QApplication, QWidget
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QLabel, QApplication, QWidget, QMessageBox
 
-from main_window import Ui_MainWindow
+from my_windows import AddSound
+from ui_designer import Ui_MainWindow
 from main_keyboard import Ui_main_keyboard
-from add_sound import Ui_AddSound
 from my_widgets import ResultWidget
 
 
@@ -27,60 +28,11 @@ class MainKeyboard(QWidget):
         (заменяет текст внутри кнопок)"""
 
         if self.katakana:
-            utils.set_keyboard_kana(self=self.ki, kana="hiragana")
+            keyboard_tools.set_keyboard_kana(self=self.ki, kana="hiragana")
             self.katakana = False
         else:
-            utils.set_keyboard_kana(self=self.ki, kana="katakana")
+            keyboard_tools.set_keyboard_kana(self=self.ki, kana="katakana")
             self.katakana = True
-
-
-class AddSound(QMainWindow):
-    def __init__(self, *args, **kwargs):
-        super(AddSound, self).__init__(*args, **kwargs)
-        self._pressed = False
-        self.Direction = None
-
-        # Фон прозрачный
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-
-        # Нет границы
-        self.setWindowFlag(Qt.FramelessWindowHint)
-
-        # Отслеживание мыши
-        self.setMouseTracking(True)
-
-        self.ui = Ui_AddSound()
-        self.ui.setupUi(self)
-
-        self.ui.close_btn.clicked.connect(self.ui.TitleBar.windowClosed.emit)
-        self.ui.btn_kana.clicked.connect(self.change_kana)
-        utils.add_sound_keyboard_button_connect(self)
-
-        # слот сигнала
-        self.ui.TitleBar.windowClosed.connect(self.close)
-        self.ui.TitleBar.windowMoved.connect(self.move)
-
-        self.katakana = False
-
-    def change_kana(self):
-        """Изменяет раскладку экранной клавиатуры (заменяет текст
-        внутри кнопок) и переназначает QLineEdit куда вводятся буквы"""
-
-        if self.katakana:
-            utils.set_keyboard_kana(self=self.ui, kana="hiragana")
-            self.katakana = False
-        else:
-            utils.set_keyboard_kana(self=self.ui, kana="katakana")
-            self.katakana = True
-
-    def keyboard_print(self, text: str):
-        """Активируется по нажатию кнопок на клавиатуре
-           и вводит текст с этих кнопок в конец строки хираганы"""
-
-        if self.katakana:
-            self.ui.kat.setText(self.ui.kat.text() + text)
-        else:
-            self.ui.hir.setText(self.ui.hir.text() + text)
 
 
 class MangaTools(QMainWindow):
@@ -112,7 +64,7 @@ class MangaTools(QMainWindow):
         self.main_keyboard.hide()
         self.main_keyboard_hide = True
 
-        utils.connect_keyboard_button(self)
+        keyboard_tools.connect_keyboard_button(self)
 
         # noinspection PyUnresolvedReferences
         self.resized.connect(self.resize_widgets)
@@ -133,7 +85,7 @@ class MangaTools(QMainWindow):
         self.main_keyboard.setMaximumWidth((h * 5) + (2 * 6))
 
         font = QFont()
-        font.setPixelSize(h/2.1)
+        font.setPixelSize(h / 2.1)
         self.main_keyboard.ki.btn_small.setFont(font)
 
     # поиск и отображение
@@ -199,7 +151,7 @@ class MangaTools(QMainWindow):
             letter = text[-1]
         except IndexError:
             return
-        mark_letter = utils.add_mark(letter)
+        mark_letter = keyboard_tools.add_mark(letter)
         self.ui.search_input.setText(text[:-1] + mark_letter)
 
     def change_letter_size(self):
@@ -212,7 +164,7 @@ class MangaTools(QMainWindow):
             letter = text[-1]
         except IndexError:
             return
-        letter = utils.change_letter_size(letter)
+        letter = keyboard_tools.change_letter_size(letter)
         self.ui.search_input.setText(text[:-1] + letter)
 
     def backspace(self):

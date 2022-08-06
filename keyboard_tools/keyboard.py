@@ -1,7 +1,7 @@
 import configparser
 
 dictionary = configparser.ConfigParser()
-dictionary.read("dictionary_file.dict", "utf-8")
+dictionary.read("./dictionaries/keyboard.dict", "utf-8")
 
 
 def connect_keyboard_button(self):
