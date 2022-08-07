@@ -1,5 +1,3 @@
-<<<<<<< HEAD
+from .sqlite_base import SoundBase, PersonalBase
 from .db_search import SoundSearch
-=======
-from db_search import SoundSearch
->>>>>>> 62e99dd (first commit)
+from .favorites import FavoriteSounds

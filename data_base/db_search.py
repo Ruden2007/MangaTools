@@ -1,16 +1,8 @@
-from data_base import sqlite_base
+from data_base import SoundBase
 from fuzzywuzzy import fuzz
 
 
 class SoundSearch:
-    def __init__(self, accuracy=70):
-        sqlite_base.sqlite_start()
-
-        sqlite_base.cur.execute('''SELECT * FROM sounds''')
-        self.res = sqlite_base.cur.fetchall()
-
-        self.accuracy = accuracy
-
     def search(self, search_input: str):
 
         results = []  # список содержащий строки и коэффициент совпадения
@@ -61,6 +53,13 @@ class SoundSearch:
         return results
 
     @staticmethod
+    def fetch_from_id(sound_id: int):
+        sb = SoundBase()
+        cursor = sb.base.cursor()
+        cursor.execute("""SELECT * FROM sounds WHERE id = ?""", (sound_id, ))
+        return cursor.fetchone()
+
+    @staticmethod
     def string_with_multiple(string: str, search_input: str):
         if "," in string:
             split_string = string.split(",")
@@ -75,6 +74,14 @@ class SoundSearch:
         else:
             return fuzz.WRatio(search_input, string)
 
+    def update_data(self):
+        self.res = SoundBase().get_all()
+
+    def __init__(self, accuracy: int = 70):
+        self.res = SoundBase().get_all()
+
+        self.accuracy = accuracy
+
 
 def main():
     search_input = input("Введите звук:")
@@ -84,5 +91,4 @@ def main():
 
 
 if __name__ == '__main__':
-    sqlite_base.sqlite_start()
     main()
