@@ -4,32 +4,31 @@ from fuzzywuzzy import fuzz
 
 class SoundSearch:
     def search(self, search_input: str):
-
         results = []  # список содержащий строки и коэффициент совпадения
 
         for i in self.res:
-            # id строки
+            # id строки(int)
             str_id = i[0]
 
             # содержат один элемент в строке
-            kun = i[1]  # Кунрэй
-            hep = i[2]  # Хэпбёрн
-            hir = i[3]  # Хирагана
-            kat = i[4]  # Катакана
+            kun = i[1]  # Кунрэй(str)
+            hep = i[2]  # Хэпбёрн(str)
+            hir = i[3]  # Хирагана(str)
+            kat = i[4]  # Катакана(str)
 
             # могут содержать несколько элементов в строке через ","
-            eng = i[5]  # Английский
-            rus = i[6]  # Русский
+            eng = i[5]  # Английский(str)
+            rus = i[6]  # Русский(str)
 
             # не участвуют в поиске
-            mean = i[7]  # Значение
-            mean2 = i[8]  # Уточнённое значение
+            mean = i[7]  # Значение(str)
+            mean2 = i[8]  # Уточнённое значение(str)
 
             # ищем коэффициенты для элементов содержащих один элемент в строке
-            k_kun = fuzz.WRatio(search_input, kun)  # Кунрэй
-            k_hep = fuzz.WRatio(search_input, hep)  # Хэпбёрн
-            k_hir = fuzz.WRatio(search_input, hir)  # Хирагана
-            k_kat = fuzz.WRatio(search_input, kat)  # Катакана
+            k_kun = fuzz.WRatio(search_input, kun)  # Кунрэй(int 0-100)
+            k_hep = fuzz.WRatio(search_input, hep)  # Хэпбёрн(int 0-100)
+            k_hir = fuzz.WRatio(search_input, hir)  # Хирагана(int 0-100)
+            k_kat = fuzz.WRatio(search_input, kat)  # Катакана(int 0-100)
 
             # ищем коэффициенты для элементов содержащих несколько элементов в строке
             k_eng = self.string_with_multiple(eng, search_input)
@@ -39,16 +38,6 @@ class SoundSearch:
 
             if match > self.accuracy:
                 results.append([str_id, kun, hep, hir, kat, eng, rus, mean, mean2, match])
-                if __name__ == '__main__':
-                    print(f"\n{i}")
-                    print(f"Совпадение: {match}%")
-                    print(f"Кунрэй {kun} совпадает на {k_kun}%")
-                    print(f"Хэпбёрн {hep} совпадает на {k_hep}%")
-                    print(f"Хирагана {hir} совпадает на {k_hir}%")
-                    print(f"Катакана {kat} совпадает на {k_kat}%")
-                    print(f"Английский {eng} совпадает на {k_eng}%")
-                    print(f"Русский {rus} совпадает на {k_rus}%")
-
         results = sorted(results, key=lambda pairt: pairt[9], reverse=True)
         return results
 
@@ -81,14 +70,3 @@ class SoundSearch:
         self.res = SoundBase().get_all()
 
         self.accuracy = accuracy
-
-
-def main():
-    search_input = input("Введите звук:")
-
-    s = SoundSearch()
-    print(s.search(search_input))
-
-
-if __name__ == '__main__':
-    main()

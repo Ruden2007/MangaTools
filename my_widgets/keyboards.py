@@ -10,15 +10,15 @@ class MainKeyboard(QWidget):
         self.ki = Ui_main_keyboard()
         self.ki.setupUi(self)
 
-        self.katakana = False
+        self.keymap = "hiragana"
 
     def change_kana(self):
         """Изменяет раскладку экранной клавиатуры
         (заменяет текст внутри кнопок)"""
 
-        if self.katakana:
-            keyboard_tools.set_keyboard_kana(self=self.ki, kana="hiragana")
-            self.katakana = False
-        else:
-            keyboard_tools.set_keyboard_kana(self=self.ki, kana="katakana")
-            self.katakana = True
+        if self.keymap == "hiragana":
+            keyboard_tools.set_keyboard_keymap(self=self.ki, kana="katakana", keyboard="main")
+            self.keymap = "katakana"
+        elif self.keymap == "katakana":
+            keyboard_tools.set_keyboard_keymap(self=self.ki, kana="hiragana", keyboard="main")
+            self.keymap = "hiragana"

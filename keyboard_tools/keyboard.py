@@ -1,5 +1,8 @@
 import configparser
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QCursor
+
 dictionary = configparser.ConfigParser()
 dictionary.read("./dictionaries/keyboard.dict", "utf-8")
 
@@ -62,8 +65,8 @@ def connect_keyboard_button(self):
     keyboard.btn_clear.clicked.connect(self.clear_search_input)
 
 
-def set_keyboard_kana(self, kana: str):
-    if kana == "katakana":
+def set_keyboard_keymap(self, kana: str, keyboard: str):
+    if kana == "katakana" and keyboard in ["main", "add_sound"]:
         self.btn_a.setText("ア")
         self.btn_i.setText("イ")
         self.btn_u.setText("ウ")
@@ -100,6 +103,7 @@ def set_keyboard_kana(self, kana: str):
         self.btn_me.setText("メ")
         self.btn_mo.setText("モ")
         self.btn_ya.setText("ヤ")
+        self.btn_.setText("")
         self.btn_yu.setText("ユ")
         self.btn_yo.setText("ヨ")
         self.btn_wa.setText("ワ")
@@ -110,9 +114,9 @@ def set_keyboard_kana(self, kana: str):
         self.btn_re.setText("レ")
         self.btn_ro.setText("ロ")
 
-        self.btn_kana.setText("あ")
+        self.btn_kana.setText("abc")
 
-    elif kana == "hiragana":
+    elif kana == "hiragana" and keyboard in ["main", "add_sound"]:
         self.btn_a.setText("あ")
         self.btn_i.setText("い")
         self.btn_u.setText("う")
@@ -149,6 +153,7 @@ def set_keyboard_kana(self, kana: str):
         self.btn_me.setText("め")
         self.btn_mo.setText("も")
         self.btn_ya.setText("や")
+        self.btn_.setText("")
         self.btn_yu.setText("ゆ")
         self.btn_yo.setText("よ")
         self.btn_wa.setText("わ")
@@ -160,6 +165,62 @@ def set_keyboard_kana(self, kana: str):
         self.btn_ro.setText("ろ")
 
         self.btn_kana.setText("ア")
+
+    elif kana == "english" and keyboard in ["add_sound"]:
+        self.btn_ra.setText("a")
+        self.btn_ya.setText("b")
+        self.btn_ma.setText("c")
+        self.btn_ha.setText("d")
+        self.btn_na.setText("e")
+        self.btn_ta.setText("f")
+        self.btn_sa.setText("g")
+        self.btn_ka.setText("h")
+        self.btn_a.setText("i")
+
+        self.btn_ri.setText("j")
+        self.btn_.setText("k")
+        self.btn_.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_mi.setText("l")
+        self.btn_hi.setText("m")
+        self.btn_ni.setText("n")
+        self.btn_chi.setText("o")
+        self.btn_shi.setText("p")
+        self.btn_ki.setText("q")
+        self.btn_i.setText("r")
+
+        self.btn_ru.setText("s")
+        self.btn_yu.setText("t")
+        self.btn_mu.setText("u")
+        self.btn_fu.setText("v")
+        self.btn_na.setText("w")
+        self.btn_tsu.setText("x")
+        self.btn_su.setText("y")
+        self.btn_ku.setText("z")
+
+        # устанавливаем оставшимся кнопкам пустой текс
+        self.btn_u.setText("")
+        self.btn_re.setText("")
+        self.btn_1.setText("")
+        self.btn_me.setText("")
+        self.btn_he.setText("")
+        self.btn_ne.setText("")
+        self.btn_te.setText("")
+        self.btn_se.setText("")
+        self.btn_ke.setText("")
+        self.btn_e.setText("")
+        self.btn_ro.setText("")
+        self.btn_yo.setText("")
+        self.btn_mo.setText("")
+        self.btn_ho.setText("")
+        self.btn_no.setText("")
+        self.btn_to.setText("")
+        self.btn_so.setText("")
+        self.btn_ko.setText("")
+        self.btn_o.setText("")
+        self.btn_n.setText("")
+        self.btn_wa.setText("")
+
+        self.btn_kana.setText("あ")
 
 
 def add_sound_keyboard_button_connect(self):
@@ -199,6 +260,7 @@ def add_sound_keyboard_button_connect(self):
     self.ui.btn_me.clicked.connect(lambda: self.keyboard_print(self.ui.btn_me.text()))
     self.ui.btn_mo.clicked.connect(lambda: self.keyboard_print(self.ui.btn_mo.text()))
     self.ui.btn_ya.clicked.connect(lambda: self.keyboard_print(self.ui.btn_ya.text()))
+    self.ui.btn_.clicked.connect(lambda: self.keyboard_print(self.ui.btn_.text()))
     self.ui.btn_yu.clicked.connect(lambda: self.keyboard_print(self.ui.btn_yu.text()))
     self.ui.btn_yo.clicked.connect(lambda: self.keyboard_print(self.ui.btn_yo.text()))
     self.ui.btn_wa.clicked.connect(lambda: self.keyboard_print(self.ui.btn_wa.text()))

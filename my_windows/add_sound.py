@@ -36,9 +36,7 @@ class AddSound(QMainWindow):
 
         # привязываем кнопки к событиям
         self.ui.close_btn.clicked.connect(self.ui.TitleBar.windowClosed.emit)
-        self.ui.btn_kana.clicked.connect(lambda: self.set_keymap("kat")
-                                         if self.keymap == "hir"
-                                         else self.set_keymap("hir"))
+        self.ui.btn_kana.clicked.connect(self.change_keymap)
         self.ui.btn_clear.clicked.connect(self.clear)
         self.ui.btn_spliter.clicked.connect(lambda: self.keyboard_print(self.ui.btn_spliter.text()))
 
@@ -125,6 +123,14 @@ class AddSound(QMainWindow):
         self.ui.hep.setText(transcript_text)
 
     # клавиатура
+    def change_keymap(self):
+        if self.keymap == "hir":
+            self.set_keymap(keymap="kat")
+        elif self.keymap == "kat":
+            self.set_keymap(keymap="eng")
+        elif self.keymap == "eng":
+            self.set_keymap(keymap="hir")
+
     def set_keymap(self, keymap: str):
         """Устанавливает значение переменной раскладки
         значение переданное в переменной keymap если это
@@ -132,13 +138,13 @@ class AddSound(QMainWindow):
         раскладку экранной клавиатуры на соответствующую"""
 
         if keymap == "hir":
-            keyboard_tools.set_keyboard_kana(self=self.ui, kana="hiragana")
+            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="hiragana", keyboard="add_sound")
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('jap'), 16
             )))
             self.keymap = keymap
         elif keymap == "kat":
-            keyboard_tools.set_keyboard_kana(self=self.ui, kana="katakana")
+            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="katakana", keyboard="add_sound")
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('jap'), 16
             )))
@@ -149,6 +155,7 @@ class AddSound(QMainWindow):
             ))
             self.keymap = keymap
         elif keymap in ["kun", "eng"]:
+            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="english", keyboard="add_sound")
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('eng'), 16
             )))
@@ -185,12 +192,17 @@ class AddSound(QMainWindow):
 
     def keyboard_print(self, text: str):
         """Активируется по нажатию кнопок на клавиатуре
-           и вводит текст с этих кнопок в конец строки хираганы"""
+           и вводит текст с этих кнопок в конец строки
+           выбранной раскладки"""
 
         if self.keymap == "hir":
             self.ui.hir.setText(self.ui.hir.text() + text)
         elif self.keymap == "kat":
             self.ui.kat.setText(self.ui.kat.text() + text)
+        elif self.keymap == "eng":
+            self.ui.eng.setText(self.ui.eng.text() + text)
+        elif self.keymap == "rus":
+            self.ui.rus.setText(self.ui.rus.text() + text)
 
     @staticmethod
     def change_stylesheet(element):

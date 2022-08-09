@@ -1,5 +1,6 @@
 import sys
 from typing import Iterable
+import time
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
@@ -19,6 +20,7 @@ class MangaTools(QMainWindow):
 
     def __init__(self):
         super(MangaTools, self).__init__()
+        self.time = time.time
 
         self._db = PersonalBase()
         self.favorites = FavoriteSounds(db=self._db)
@@ -79,9 +81,16 @@ class MangaTools(QMainWindow):
         self.searching(query=query)
 
     def searching(self, query):
+        start_time = self.time()
         self.clear_searching_results()
+        print(f"clear results time = {self.time() - start_time}")
+        start_time2 = self.time()
         results = self.sound_search.search(search_input=query)
+        print(f"search results time = {self.time() - start_time2}")
+        start_time3 = self.time()
         self.show_results(results=results)
+        print(f"show result time = {self.time() - start_time3}")
+        print(f"all show result time = {self.time() - start_time}")
 
     def show_favorites(self):
         self.clear_searching_results()
@@ -89,20 +98,32 @@ class MangaTools(QMainWindow):
         ids = self._db.get_favorites()
         result = []
 
-        for id in ids:
-            result.append(self.sound_search.fetch_from_id(id[0]))
+        for db_id in ids:
+            result.append(self.sound_search.fetch_from_id(db_id[0]))
 
         self.show_results(result)
 
     # noinspection PyTypeChecker
     def clear_searching_results(self):
+        """Создаёт новый экземпляр виджета для
+        self.ui.scrollArea и переопределяет главный
+        виджет для self.ui.scrollArea это сделано для
+        ускорения работы так как при удалении каждого
+        виджета результатов поиска требуется в 18-19
+        раз больше времени чем на удаление всего
+        виджета хранящего эти результаты.
+
+        Старый вариант:
         for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
+            self.layout.itemAt(i).widget().setParent(None)"""
+
+        self.widget = QWidget(self)
+        self.layout = QVBoxLayout(self.widget)
+        self.ui.scrollArea.setWidget(self.widget)
 
     def show_results(self, results: Iterable):
         """Выводит результаты поиска если таковые есть
         иначе выводит надпись, что ничего не найдено"""
-
         if results:
             for result in results:
                 w = ResultWidget(result=result, fav=self.favorites)

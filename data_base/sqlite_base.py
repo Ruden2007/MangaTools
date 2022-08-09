@@ -45,7 +45,8 @@ class PersonalBase:
         self.base.commit()
 
     def get_favorites(self):
-        self.cursor.execute("""SELECT id FROM favorites""")
+        self.cursor.execute("""SELECT id FROM favorites ORDER BY uses DESC""")
+        logger.debug(f"Successful load data from database {self._path_ = }")
         favorites = self.cursor.fetchall()
         return favorites
 

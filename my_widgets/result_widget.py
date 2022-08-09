@@ -2,6 +2,8 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
 
 from my_widgets import ClickToCopyLabel, SoundIDLabel
 
+import time
+
 
 class ResultWidget(QWidget):
     def __init__(self, result: tuple, fav: object, *args, **kwargs):
