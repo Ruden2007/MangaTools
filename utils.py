@@ -56,7 +56,7 @@ def connect_keyboard_button(self):
 
     keyboard.btn_mark.clicked.connect(self.add_sound_mark)
     keyboard.btn_small.clicked.connect(self.change_letter_size)
-    keyboard.btn_kana.clicked.connect(self.main_keyboard.change_kana)
+    keyboard.btn_kana.clicked.connect(self.main_keyboard.change_keyboard_keymap)
     keyboard.btn_search.clicked.connect(self.start_search)
     keyboard.btn_backspace.clicked.connect(self.backspace)
     keyboard.btn_clear.clicked.connect(self.clear_search_input)

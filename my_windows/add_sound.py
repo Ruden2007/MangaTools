@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtGui import QKeySequence, QShortcut
 
 import keyboard_tools
 from Transcription import Transcript, ErrorTranscript
@@ -29,17 +30,20 @@ class AddSound(QMainWindow):
         # Отслеживание мыши
         self.setMouseTracking(True)
 
+        # Клавиатурные сокращения:
+        self.return_cleared_text_keys = QShortcut(QKeySequence('Ctrl+Z'), self)
+        self.return_cleared_text_keys.activated.connect(self.return_cleared_text)
+
         self.ui = Ui_AddSound()
         self.ui.setupUi(self)
 
-        self.keymap = "hir"
-
         # привязываем кнопки к событиям
         self.ui.close_btn.clicked.connect(self.ui.TitleBar.windowClosed.emit)
-        self.ui.btn_kana.clicked.connect(self.change_keymap)
+        self.ui.btn_kana.clicked.connect(self.change_keyboard_keymap)
         self.ui.btn_clear.clicked.connect(self.clear)
         self.ui.btn_spliter.clicked.connect(lambda: self.keyboard_print(self.ui.btn_spliter.text()))
 
+        # привязываем нажатие на поля ввода к смене раскладки клавиатуры
         self.ui.hir.clicked.connect(lambda: self.set_keymap("hir"))
         self.ui.kat.clicked.connect(lambda: self.set_keymap("kat"))
         self.ui.kun.clicked.connect(lambda: self.set_keymap("kun"))
@@ -49,15 +53,17 @@ class AddSound(QMainWindow):
         self.ui.mean.clicked.connect(lambda: self.set_keymap("mean"))
         self.ui.mean2.clicked.connect(lambda: self.set_keymap("mean2"))
 
-        keyboard_tools.add_sound_keyboard_button_connect(self)
-
         # кнопки авто-транскрипции
         self.ui.hir_auto.clicked.connect(self.auto_hir)
         self.ui.kat_auto.clicked.connect(self.auto_kat)
         self.ui.hep_auto.clicked.connect(self.auto_hep)
         self.ui.kun_auto.clicked.connect(self.auto_kun)
 
-        # Привязываем событие изменения текста к функции смены цвета текста
+        # функция привязки всех кнопок на клавиатуре к функции ввода текста
+        keyboard_tools.add_sound_keyboard_button_connect(self)
+
+        """Привязываем событие изменения текста к функции смены цвета текста
+        для того чтобы текст отображался цвета отличного от placeholder-текста"""
         self.ui.hir.textChanged.connect(lambda: self.change_stylesheet(element=self.ui.hir))
         self.ui.kat.textChanged.connect(lambda: self.change_stylesheet(element=self.ui.kat))
         self.ui.kun.textChanged.connect(lambda: self.change_stylesheet(element=self.ui.kun))
@@ -71,6 +77,7 @@ class AddSound(QMainWindow):
         self.ui.TitleBar.windowClosed.connect(self.close)
         self.ui.TitleBar.windowMoved.connect(self.move)
 
+        # устанавливаем раскладку по умолчанию
         self.keymap = "hir"
 
     # авто-транскрипция
@@ -123,12 +130,20 @@ class AddSound(QMainWindow):
         self.ui.hep.setText(transcript_text)
 
     # клавиатура
-    def change_keymap(self):
+    def change_keyboard_keymap(self):
+        """В зависимости от текущей раскладки
+        клавиатуры устанавливает следующую по счёту по
+        нажатию кнопки - смены раскладки на клавиатуре"""
+
         if self.keymap == "hir":
             self.set_keymap(keymap="kat")
         elif self.keymap == "kat":
             self.set_keymap(keymap="eng")
         elif self.keymap == "eng":
+            self.set_keymap(keymap="rus")
+        elif self.keymap in ["kun", "eng"]:
+            self.set_keymap(keymap="rus")
+        elif self.keymap in ["hep", "rus", "mean", "mean2"]:
             self.set_keymap(keymap="hir")
 
     def set_keymap(self, keymap: str):
@@ -138,57 +153,73 @@ class AddSound(QMainWindow):
         раскладку экранной клавиатуры на соответствующую"""
 
         if keymap == "hir":
-            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="hiragana", keyboard="add_sound")
+            keyboard_tools.set_keymap(self=self.ui, keymap="hiragana", keyboard='add_sound')
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('jap'), 16
             )))
             self.keymap = keymap
         elif keymap == "kat":
-            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="katakana", keyboard="add_sound")
+            keyboard_tools.set_keymap(self=self.ui, keymap="katakana", keyboard='add_sound')
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('jap'), 16
             )))
             self.keymap = keymap
         elif keymap in ["hep", "rus", "mean", "mean2"]:
+            keyboard_tools.set_keymap(self=self.ui, keymap="russian", keyboard='add_sound')
             py_win_keyboard_layout.change_foreground_window_keyboard_layout(int(
                 dictionary['keyboard_layout_hex'].get('rus'), 16
             ))
             self.keymap = keymap
         elif keymap in ["kun", "eng"]:
-            keyboard_tools.set_keyboard_keymap(self=self.ui, kana="english", keyboard="add_sound")
+            keyboard_tools.set_keymap(self=self.ui, keymap="english", keyboard='add_sound')
             py_win_keyboard_layout.change_foreground_window_keyboard_layout((int(
                 dictionary['keyboard_layout_hex'].get('eng'), 16
             )))
             self.keymap = keymap
-        else:
-            print("else")
-            self.keymap = keymap
 
     def clear(self):
+        """В зависимости от установленной раскладки
+        клавиатуры устанавливает соответствующему полю
+        ввода значение текста как пустую строку и записывает
+        удалённый текст в переменную self.cleared_text
+        для возможности вернуть этот текст при
+        нажатии клавиш ctrl + z"""
+
         if self.keymap == "hir":
-            self.cleared_text = self.ui.kat.text()
+            self.cleared_text = (self.ui.hir.text(), self.keymap)
             self.ui.hir.setText("")
         elif self.keymap == "kat":
-            self.cleared_text = self.ui.kat.text()
+            self.cleared_text = (self.ui.kat.text(), self.keymap)
             self.ui.kat.setText("")
         elif self.keymap == "kun":
-            self.cleared_text = self.ui.kun.text()
+            self.cleared_text = (self.ui.kun.text(), self.keymap)
             self.ui.kun.setText("")
         elif self.keymap == "hep":
-            self.cleared_text = self.ui.hep.text()
+            self.cleared_text = (self.ui.hep.text(), self.keymap)
             self.ui.hep.setText("")
         elif self.keymap == "eng":
-            self.cleared_text = self.ui.eng.text()
+            self.cleared_text = (self.ui.eng.text(), self.keymap)
             self.ui.eng.setText("")
         elif self.keymap == "rus":
-            self.cleared_text = self.ui.rus.text()
+            self.cleared_text = (self.ui.rus.text(), self.keymap)
             self.ui.rus.setText("")
         elif self.keymap == "mean":
-            self.cleared_text = self.ui.mean.toPlainText()
+            self.cleared_text = (self.ui.mean.toPlainText(), self.keymap)
             self.ui.mean.setText("")
         elif self.keymap == "mean2":
-            self.cleared_text = self.ui.mean2.toPlainText()
+            self.cleared_text = (self.ui.mean2.toPlainText(), self.keymap)
             self.ui.mean2.setText("")
+
+    def return_cleared_text(self):
+        """Активируется при нажатии клавиш ctrl + z и вводит текст
+        self.cleared_text[0] в поле ввода self.cleared_text[1].
+        Почему-то не работает после нажатия на другие поля
+        ввода хотя текст записанный в self.cleared_text
+        остаётся прежним"""
+
+        if self.cleared_text:
+            self.set_keymap(keymap=self.cleared_text[1])
+            self.keyboard_print(self.cleared_text[0])
 
     def keyboard_print(self, text: str):
         """Активируется по нажатию кнопок на клавиатуре
@@ -199,10 +230,18 @@ class AddSound(QMainWindow):
             self.ui.hir.setText(self.ui.hir.text() + text)
         elif self.keymap == "kat":
             self.ui.kat.setText(self.ui.kat.text() + text)
+        elif self.keymap == "kun":
+            self.ui.kun.setText(self.ui.kun.text() + text)
         elif self.keymap == "eng":
             self.ui.eng.setText(self.ui.eng.text() + text)
+        elif self.keymap == "hep":
+            self.ui.hep.setText(self.ui.hep.text() + text)
         elif self.keymap == "rus":
             self.ui.rus.setText(self.ui.rus.text() + text)
+        elif self.keymap == "mean":
+            self.ui.mean.setText(self.ui.mean.toPlainText() + text)
+        elif self.keymap == "mean2":
+            self.ui.mean2.setText(self.ui.mean2.toPlainText() + text)
 
     @staticmethod
     def change_stylesheet(element):

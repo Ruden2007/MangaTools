@@ -10,6 +10,7 @@ class TitleBar(QWidget):
 
     def __init__(self, *args, **kwargs):
         super(TitleBar, self).__init__(*args, **kwargs)
+        self.mPos = None
 
     def mousePressEvent(self, event):
         """ Событие клика мыши """
