@@ -29,7 +29,7 @@ class Ui_ErrorSample(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.TitleBar = TitleBar(self.centralwidget)
         self.TitleBar.setObjectName(u"TitleBar")
-        self.TitleBar.setContentsMargins(0, 2, 0, 6)
+        self.TitleBar.setContentsMargins(0, 2, 0, 3)
         self.TitleBar.setMaximumSize(QSize(16777215, 25))
         self.TitleBar.setStyleSheet(u"QPushButton{\n"
 "	border: none;\n"
@@ -116,7 +116,7 @@ class Ui_ErrorSample(object):
         sizePolicy3.setHeightForWidth(self.error_text.sizePolicy().hasHeightForWidth())
         self.error_text.setSizePolicy(sizePolicy3)
         self.error_text.setFont(font)
-        self.error_text.setWordWrap(False)
+        self.error_text.setWordWrap(True)
 
         self.horizontalLayout_2.addWidget(self.error_text)
 
