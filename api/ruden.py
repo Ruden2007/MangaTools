@@ -1,9 +1,18 @@
+import configparser
+
 import requests
 
 
 class RudenAPI:
     def __init__(self):
-        self.url = "http://ruden.sytes.net/api/"
+        config = configparser.ConfigParser()
+        config.read("../settings.ini", "utf-8")
+
+        if config['api']['use_proxy_server'] == "True":
+            self.url = "https://rudenapi.000webhostapp.com/"
+        else:
+            self.url = "http://ruden.sytes.net/api/"
+        print("Use url: " + self.url + "add-sound/")
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/103.0.5060.114 Safari/537.36 OPR/89.0.4447.64'

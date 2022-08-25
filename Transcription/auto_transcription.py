@@ -1,9 +1,5 @@
 import configparser
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QIcon, QCursor
-from PySide6.QtWidgets import QMessageBox
-
 dictionary = configparser.ConfigParser()
 dictionary.read("dictionaries/transcript.dict", "utf-8")
 
