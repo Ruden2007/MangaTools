@@ -13,7 +13,7 @@ class AboutApplication(QMainWindow):
         self.setMaximumSize(QSize(16777215, 16777215))
 
         self.webV = QWebEngineView()
-        self.webV.load("http://192.168.31.2/MangaTools/about/index.html")
+        self.webV.load("http://ruden.sytes.net/MangaTools/about/index.html")
 
         self.widget = QWidget(self)
         self.widget.setContentsMargins(0, 0, 0, 0)
