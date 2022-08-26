@@ -2,13 +2,10 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
 
 from my_widgets import ClickToCopyLabel, SoundIDLabel
 
-import time
-
 
 class ResultWidget(QWidget):
-    def __init__(self, result: tuple, fav: object, *args, **kwargs):
+    def __init__(self, result: tuple, *args, **kwargs):
         super(ResultWidget, self).__init__(*args, **kwargs)
-        self.fav = fav
 
         self.setStyleSheet(u"background-color: rgba(255, 255, 255, 0);")
         self.layout = QVBoxLayout(self)
@@ -56,11 +53,11 @@ class ResultWidget(QWidget):
 
     def add_header_button(self, result):
         db_id = result[0]
-        clik_to_copy_id = SoundIDLabel(f"{result[0]}", db_id=db_id, fav=self.fav)
-        clik_to_copy_kun = ClickToCopyLabel(f"{result[1]}", db_id=db_id, fav=self.fav)
-        clik_to_copy_hep = ClickToCopyLabel(f"{result[2]}", db_id=db_id, fav=self.fav)
-        clik_to_copy_hir = ClickToCopyLabel(f"{result[3]}", db_id=db_id, fav=self.fav)
-        clik_to_copy_kat = ClickToCopyLabel(f"{result[4]}", db_id=db_id, fav=self.fav)
+        clik_to_copy_id = SoundIDLabel(f"{result[0]}", db_id=db_id)
+        clik_to_copy_kun = ClickToCopyLabel(f"{result[1]}", db_id=db_id)
+        clik_to_copy_hep = ClickToCopyLabel(f"{result[2]}", db_id=db_id)
+        clik_to_copy_hir = ClickToCopyLabel(f"{result[3]}", db_id=db_id)
+        clik_to_copy_kat = ClickToCopyLabel(f"{result[4]}", db_id=db_id)
 
         self.header_layout.addWidget(clik_to_copy_id)
         self.header_layout.addWidget(clik_to_copy_kun)
@@ -75,7 +72,7 @@ class ResultWidget(QWidget):
             label_eng = QLabel(label_text)
             self.translation_layout.addWidget(label_eng)
             for r in split_result:
-                clik_to_copy = ClickToCopyLabel(text=f"{r}", db_id=db_id, fav=self.fav)
+                clik_to_copy = ClickToCopyLabel(text=f"{r}", db_id=db_id)
 
                 self.translation_layout.addWidget(clik_to_copy)
 
@@ -90,7 +87,7 @@ class ResultWidget(QWidget):
                 label_eng = QLabel(label_text)
                 self.translation_layout.addWidget(label_eng)
 
-                clik_to_copy = ClickToCopyLabel(f"{result}", db_id=db_id, fav=self.fav)
+                clik_to_copy = ClickToCopyLabel(f"{result}", db_id=db_id)
 
                 self.translation_layout.addWidget(clik_to_copy)
 

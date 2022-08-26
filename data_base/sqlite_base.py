@@ -42,6 +42,15 @@ class PersonalBase:
             logger.error(f"Failed to connect to database {self._path_=}")
 
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS favorites (id INT, uses INT)""")
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS sounds (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                                  kun TEXT,
+                                                                  hep TEXT,
+                                                                  hir TEXT,
+                                                                  kat TEXT,
+                                                                  eng TEXT,
+                                                                  rus TEXT,
+                                                                  mean TEXT,
+                                                                  mean2 TEXT)""")
         self.base.commit()
 
     def get_favorites(self):
@@ -49,6 +58,11 @@ class PersonalBase:
         logger.debug(f"Successful load data from database {self._path_ = }")
         favorites = self.cursor.fetchall()
         return favorites
+
+    def get_all_sounds(self):
+        self.cursor.execute("""SELECT * FROM sounds""")
+        logger.debug(f"Successful load data from database {self._path_ = }")
+        return self.cursor.fetchall()
 
     def __del__(self):
         self.base.close()

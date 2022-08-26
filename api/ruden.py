@@ -6,7 +6,7 @@ import requests
 class RudenAPI:
     def __init__(self):
         config = configparser.ConfigParser()
-        config.read("../settings.ini", "utf-8")
+        config.read("settings.ini", "utf-8")
 
         if config['api']['use_proxy_server'] == "True":
             self.url = "https://rudenapi.000webhostapp.com/"
@@ -24,6 +24,8 @@ class RudenAPI:
         print(j)
         if j['status'] == 'Ok':
             return True
+        else:
+            return False
 
     def set_headers(self, headers: dict):
         self.headers = headers

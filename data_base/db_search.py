@@ -1,12 +1,27 @@
-from data_base import SoundBase
 from fuzzywuzzy import fuzz
+from colorama import init, Fore
+from sqlite import sb, pb, sbcursor, pbcursor
 
 
 class SoundSearch:
     def search(self, search_input: str):
-        results = []  # список содержащий строки и коэффициент совпадения
+        self.results = []  # список содержащий строки и коэффициент совпадения
+        self.sound_filter(res=self.res, search_input=search_input, base="main")
+        self.sound_filter(res=self.personal_res, search_input=search_input, base="personal")
 
-        for i in self.res:
+        results = sorted(self.results, key=lambda pairt: pairt[9], reverse=True)
+        return results
+
+    def sound_filter(self, res, search_input: str, base: str):
+        if base == "main":
+            pass
+        elif base == "personal":
+            pass
+        else:
+            print(Fore.RED + f"Error: base может принимать значения: main, personal. Вы передали {base = }")
+            return
+
+        for i in res:
             # id строки(int)
             str_id = i[0]
 
@@ -37,16 +52,23 @@ class SoundSearch:
             match = max([k_kun, k_hep, k_hir, k_kat, k_eng, k_rus])
 
             if match > self.accuracy:
-                results.append([str_id, kun, hep, hir, kat, eng, rus, mean, mean2, match])
-        results = sorted(results, key=lambda pairt: pairt[9], reverse=True)
-        return results
+                if base == "personal":
+                    str_id = f"{str_id}P"
+                self.results.append([str_id, kun, hep, hir, kat, eng, rus, mean, mean2, match])
 
     @staticmethod
-    def fetch_from_id(sound_id: int):
-        sb = SoundBase()
-        cursor = sb.base.cursor()
-        cursor.execute("""SELECT * FROM sounds WHERE id = ?""", (sound_id, ))
-        return cursor.fetchone()
+    def fetch_from_id(sound_id: str):
+        sound_id = str(sound_id)
+        if "P" in sound_id:
+            sound_id = int(sound_id.replace("P", ""))
+            pbcursor.execute("""SELECT * FROM sounds WHERE id = ?""", (sound_id, ))
+            result = list(pbcursor.fetchone())
+            result[0] = f"{result[0]}P"
+            return result
+        else:
+            sound_id = int(sound_id)
+            sbcursor.execute("""SELECT * FROM sounds WHERE id = ?""", (sound_id,))
+            return sbcursor.fetchone()
 
     @staticmethod
     def string_with_multiple(string: str, search_input: str):
@@ -64,9 +86,12 @@ class SoundSearch:
             return fuzz.WRatio(search_input, string)
 
     def update_data(self):
-        self.res = SoundBase().get_all()
+        self.res = sb.get_all()
 
     def __init__(self, accuracy: int = 70):
-        self.res = SoundBase().get_all()
+        init()
+        self.results = []
+        self.res = sb.get_all()
+        self.personal_res = pb.get_all_sounds()
 
         self.accuracy = accuracy

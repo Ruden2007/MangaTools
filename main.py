@@ -11,6 +11,7 @@ from data_base import SoundSearch, PersonalBase, FavoriteSounds
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QLabel, QApplication, QWidget
 
 from my_windows import AddSound
+from sqlite import pb
 from ui_designer import Ui_MainWindow
 from my_widgets import ResultWidget, MainKeyboard
 
@@ -22,8 +23,8 @@ class MangaTools(QMainWindow):
         super(MangaTools, self).__init__()
         self.time = time.time
 
-        self._db = PersonalBase()
-        self.favorites = FavoriteSounds(db=self._db)
+        self._db = pb
+        self.favorites = FavoriteSounds()
 
         self.add_sound_window = AddSound()
         self.sound_search = SoundSearch()
@@ -126,7 +127,7 @@ class MangaTools(QMainWindow):
         иначе выводит надпись, что ничего не найдено"""
         if results:
             for result in results:
-                w = ResultWidget(result=result, fav=self.favorites)
+                w = ResultWidget(result=result)
 
                 self.layout.addWidget(w)
         else:

@@ -4,7 +4,8 @@ from PySide6.QtGui import QKeySequence, QShortcut
 
 import keyboard_tools
 from Transcription import Transcript, ErrorTranscript
-from ui_designer import Ui_AddSound
+from ui_designer import Ui_AddSound, Ui_ErrorSample
+from .add_sound_dialog import AddSoundDialog
 
 import py_win_keyboard_layout
 
@@ -14,9 +15,40 @@ dictionary = configparser.ConfigParser()
 dictionary.read("./dictionaries/keyboard.dict", "utf-8")
 
 
+class AddSoundErrors(QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Нет границы
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowModality(Qt.ApplicationModal)
+
+        self.ui = Ui_ErrorSample()
+        self.ui.setupUi(self)
+
+        self.ui.TitleBar.windowMoved.connect(self.move)
+        self.ui.close_btn.clicked.connect(self.close)
+        self.ui.ok.clicked.connect(self.close)
+
+    def missing_args(self, necessary_args: str):
+        self.ui.error_title.setText("Ошибка!")
+        self.ui.error_text.setText("Отсутствуют нужные аргументы!\n"
+                                   "Введите хотя бы одно из этих значений:\n"
+                                   f"{necessary_args}")
+
+        self.show()
+
+    def warning(self, text: str):
+        self.ui.error_title.setText("Предупреждение!")
+        self.ui.error_text.setText(text)
+
+        self.show()
+
+
 class AddSound(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(AddSound, self).__init__(*args, **kwargs)
+        self.dialog = AddSoundDialog()
         self.cleared_text = None
         self._pressed = False
         self.Direction = None
@@ -42,6 +74,7 @@ class AddSound(QMainWindow):
         self.ui.btn_kana.clicked.connect(self.change_keyboard_keymap)
         self.ui.btn_clear.clicked.connect(self.clear)
         self.ui.btn_spliter.clicked.connect(lambda: self.keyboard_print(self.ui.btn_spliter.text()))
+        self.ui.ok.clicked.connect(self.show_dialog)
 
         # привязываем нажатие на поля ввода к смене раскладки клавиатуры
         self.ui.hir.clicked.connect(lambda: self.set_keymap("hir"))
@@ -77,7 +110,7 @@ class AddSound(QMainWindow):
         self.ui.TitleBar.windowClosed.connect(self.close)
         self.ui.TitleBar.windowMoved.connect(self.move)
 
-        # устанавливаем раскладку по умолчанию
+        # раскладка по умолчанию
         self.keymap = "hir"
 
     # авто-транскрипция
@@ -88,7 +121,7 @@ class AddSound(QMainWindow):
         if self.ui.kat.text():
             transcript_text = Transcript.kat_to_hir(text=self.ui.kat.text())
         else:
-            return ErrorTranscript(self).missing_args("Катакана.")
+            return ErrorTranscript(self).missing_args("катакана.")
 
         self.ui.hir.setText(transcript_text)
 
@@ -99,7 +132,7 @@ class AddSound(QMainWindow):
         if self.ui.hir.text():
             transcript_text = Transcript.hir_to_kat(text=self.ui.hir.text())
         else:
-            return ErrorTranscript(self).missing_args("Хирагана.")
+            return ErrorTranscript(self).missing_args("хирагана.")
 
         self.ui.kat.setText(transcript_text)
 
@@ -112,7 +145,7 @@ class AddSound(QMainWindow):
         elif self.ui.kat.text():
             transcript_text = Transcript.kat_to_kun(text=self.ui.kat.text())
         else:
-            return ErrorTranscript(self).missing_args("Хирагана, катакана.")
+            return ErrorTranscript(self).missing_args("хирагана, катакана.")
 
         self.ui.kun.setText(transcript_text)
 
@@ -125,7 +158,7 @@ class AddSound(QMainWindow):
         elif self.ui.kat.text():
             transcript_text = Transcript.kat_to_hep(text=self.ui.kat.text())
         else:
-            return ErrorTranscript(self).missing_args("Хирагана, катакана.")
+            return ErrorTranscript(self).missing_args("хирагана, катакана.")
 
         self.ui.hep.setText(transcript_text)
 
@@ -230,18 +263,58 @@ class AddSound(QMainWindow):
             self.ui.hir.setText(self.ui.hir.text() + text)
         elif self.keymap == "kat":
             self.ui.kat.setText(self.ui.kat.text() + text)
+        elif self.keymap == "hep":
+            self.ui.hep.setText(self.ui.hep.text() + text)
         elif self.keymap == "kun":
             self.ui.kun.setText(self.ui.kun.text() + text)
         elif self.keymap == "eng":
             self.ui.eng.setText(self.ui.eng.text() + text)
-        elif self.keymap == "hep":
-            self.ui.hep.setText(self.ui.hep.text() + text)
         elif self.keymap == "rus":
             self.ui.rus.setText(self.ui.rus.text() + text)
         elif self.keymap == "mean":
             self.ui.mean.setText(self.ui.mean.toPlainText() + text)
         elif self.keymap == "mean2":
             self.ui.mean2.setText(self.ui.mean2.toPlainText() + text)
+
+    # окна
+    def show_dialog(self):
+        """Открываем окно диалога с выбором: отправлять
+         звук на модерацию или сохранить локально"""
+        print("show")
+
+        if not any((self.ui.hir.text(), self.ui.kat.text(), self.ui.kun.text(), self.ui.hep.text())):
+            return AddSoundErrors(self).missing_args("хирагана, катакана, кунрей, хэпбёрн.")
+
+        if self.ui.hir.text() or self.ui.kat.text():
+            necessary_args = []
+            if not self.ui.hir.text():
+                necessary_args.append("хирагана")
+            if not self.ui.kat.text():
+                necessary_args.append("катакана")
+            if not self.ui.kun.text():
+                necessary_args.append("кунрей")
+            if not self.ui.hep.text():
+                necessary_args.append("хепбёрн")
+
+            if necessary_args:
+                count = len(necessary_args)
+                return AddSoundErrors(self).warning(
+                    text=f'{"Отсутствуют следующие аргументы:" if count > 1 else "Отсутствует следующий аргумент:"}'
+                         f'\n{", ".join(necessary_args)}.\nПросто нажмите кнопку "auto" возле '
+                         f'{"соответствующих полей" if count > 1 else "соответствующего поля"} чтобы '
+                         f'автоматически сгенерировать {"их" if count > 1 else "его"}.')
+        data = {
+        'kun': self.ui.kun.text(),
+        'hep': self.ui.hep.text(),
+        'hir': self.ui.hir.text(),
+        'kat': self.ui.kat.text(),
+        'eng': self.ui.eng.text(),
+        'rus': self.ui.rus.text(),
+        'mean': self.ui.mean.toPlainText(),
+        'mean2': self.ui.mean2.toPlainText()
+    }
+        self.dialog.add_send_data(data)
+        self.dialog.show()
 
     @staticmethod
     def change_stylesheet(element):

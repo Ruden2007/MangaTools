@@ -1,3 +1,4 @@
+from sqlite import pb
 
 
 class FavoriteSounds:
@@ -25,6 +26,6 @@ class FavoriteSounds:
         else:
             return False
 
-    def __init__(self, db: object):
-        self.cur = db.cursor
-        self.commit = db.base.commit
+    def __init__(self):
+        self.cur = pb.cursor
+        self.commit = pb.base.commit

@@ -4,10 +4,14 @@ from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QLabel
 
 
+from data_base import FavoriteSounds
+fs = FavoriteSounds()
+
+
 class ClickToCopyLabel(QLabel):
-    def __init__(self, text: str, db_id: int, fav: object, *args, **kwargs):
+    def __init__(self, text: str, db_id: int, *args, **kwargs):
         super(ClickToCopyLabel, self).__init__(*args, **kwargs)
-        self.fav = fav
+        self.fav = fs
 
         self.setText(text)
 
@@ -23,10 +27,10 @@ class ClickToCopyLabel(QLabel):
 
 
 class SoundIDLabel(QLabel):
-    def __init__(self, text: str, db_id: int, fav: object, *args, **kwargs):
+    def __init__(self, text: str, db_id: int, *args, **kwargs):
         super(SoundIDLabel, self).__init__(*args, **kwargs)
         self.db_id = db_id
-        self.fav = fav
+        self.fav = fs
 
         self.favorite = self.fav.is_favorite(self.db_id)
 
