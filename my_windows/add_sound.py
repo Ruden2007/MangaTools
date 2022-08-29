@@ -282,8 +282,8 @@ class AddSound(QMainWindow):
          звук на модерацию или сохранить локально"""
         print("show")
 
-        if not any((self.ui.hir.text(), self.ui.kat.text(), self.ui.kun.text(), self.ui.hep.text())):
-            return AddSoundErrors(self).missing_args("хирагана, катакана, кунрей, хэпбёрн.")
+        if not any((self.ui.hir.text(), self.ui.kat.text(), self.ui.kun.text(), self.ui.hep.text(), self.ui.eng.text())):
+            return AddSoundErrors(self).missing_args("хирагана, катакана, кунрей, хэпбёрн, английский.")
 
         if self.ui.hir.text() or self.ui.kat.text():
             necessary_args = []

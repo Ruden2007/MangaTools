@@ -39,11 +39,14 @@ class AddSoundDialog(QMainWindow):
     def send(self):
         if self.send_data:
             api = RudenAPI()
-            result = api.add_sound(self.send_data)
+            try:
+                result = api.add_sound(self.send_data)
+            except:
+                return 'Не удалось отправить данные, попробуйте включить "Использовать прокси" в настройках.'
             print(result)
             self.save_local()
             if not result:
-                return 'Не удалось отправить данные, попробуйте включить "Использовать прокси" в настройках.'
+                return "Неизвестная ошибка, не удалось отправить данные!"
             else:
                 return 'Отправка данных успешна!'
         else:
