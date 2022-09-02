@@ -50,7 +50,7 @@ class AddSoundDialog(QMainWindow):
             else:
                 return 'Отправка данных успешна!'
         else:
-            return 'Вы не добавили данне для отправки, пожалуйста воспользуйтесь методом add_send_data(data: dict)'
+            return 'Вы не добавили данные для отправки, пожалуйста воспользуйтесь методом add_send_data(data: dict)'
 
     def save_local(self):
         cur = pb.base.cursor()
